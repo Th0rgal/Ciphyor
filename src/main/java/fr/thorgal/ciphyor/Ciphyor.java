@@ -3,8 +3,8 @@ package fr.thorgal.ciphyor;
 import com.google.common.io.BaseEncoding;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -21,7 +21,7 @@ public class Ciphyor {
     );
 
 
-    public static String encode(String key, String input) throws UnsupportedEncodingException {
+    public static String encode(String key, String input) {
 
         int salt = generateSalt(key);
 
@@ -32,7 +32,7 @@ public class Ciphyor {
         Random random = new Random(ByteBuffer.wrap(getHash(key, salt)).getInt());
 
         //we encode the message to base32 using Guava
-        String message = BaseEncoding.base32().encode(input.getBytes("UTF-8"));
+        String message = BaseEncoding.base32().encode(input.getBytes(StandardCharsets.UTF_8));
         StringBuilder output = new StringBuilder();
         for (char c : message.toCharArray())
             if (c != '=')
@@ -43,7 +43,7 @@ public class Ciphyor {
     }
 
 
-    public static String decode(String key, String input) throws UnsupportedEncodingException {
+    public static String decode(String key, String input) {
 
         //The first 7 characters are the salt
         int salt = ByteBuffer.wrap(
@@ -61,7 +61,7 @@ public class Ciphyor {
         for (char c : cipheredMessage.toCharArray())
             decipheredOutput.append(getChar(alphabet.indexOf(c) - random.nextInt(alphabet.size())));
 
-        return new String(BaseEncoding.base32().decode(decipheredOutput.toString()), "UTF-8");
+        return new String(BaseEncoding.base32().decode(decipheredOutput.toString()), StandardCharsets.UTF_8);
     }
 
 
