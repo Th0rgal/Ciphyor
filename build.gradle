@@ -3,7 +3,7 @@ plugins {
 }
 
 version '1.0-SNAPSHOT'
-
+project.buildDir = 'C:\\Users\\thoma\\OneDrive - elcass\\Dev\\Build'
 sourceCompatibility = 1.8
 
 repositories {

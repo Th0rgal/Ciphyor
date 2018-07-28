@@ -1,11 +1,10 @@
 package fr.thorgal.ciphyor;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 public class Core {
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
