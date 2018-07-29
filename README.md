@@ -1,12 +1,12 @@
 ![Ciphyor Social Banner](https://zupimages.net/up/18/30/t9ab.jpg)
 # Ciphyor
 
-##What's it?
+## What's it?
 A Java implementation of my own encryption algorithm inspired by Vernam one.
 
-##How does it work ?
+## How does it work ?
 
-###Encryption
+### Encryption
 * You enter two String: a key and a message
 * The message is encoded in base32 (using Guava)
 * The key is hashed into a SHA-3 (515 bits) hash that we will call h1 (it's an int)
