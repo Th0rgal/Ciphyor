@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Random;
 
 public class Ciphyor {
@@ -19,7 +20,6 @@ public class Ciphyor {
             'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
             'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     );
-
 
     public static String encode(String key, String input) {
 
@@ -38,7 +38,14 @@ public class Ciphyor {
             if (c != '=')
                 output.append(getChar(alphabet.indexOf(c) + random.nextInt(alphabet.size())));
 
-        String encryptedSalt = BaseEncoding.base32().encode(ByteBuffer.allocate(4).putInt(salt).array()).replace("=", "");
+        String encodedSalt = BaseEncoding.base32().encode(ByteBuffer.allocate(4).putInt(salt).array()).replace("=", "");
+        StringBuilder encryptedSalt = new StringBuilder();
+        //We encrypt the salt using the hash of the key (the seed without the salt)
+        random = new Random(ByteBuffer.wrap(getHash(key, 0)).getInt());
+        for (char c : encodedSalt.toCharArray())
+            if (c != '=')
+                encryptedSalt.append(getChar(alphabet.indexOf(c) + random.nextInt(alphabet.size())));
+
         return encryptedSalt + "" + output.toString();
     }
 
@@ -46,16 +53,21 @@ public class Ciphyor {
     public static String decode(String key, String input) {
 
         //The first 7 characters are the salt
+        String encryptedSalt = String.format("%.7s", input);
+        StringBuilder encodedSalt = new StringBuilder();
+        //We encrypt the salt using the hash of the key (the seed without the salt)
+        Random random = new Random(ByteBuffer.wrap(getHash(key, 0)).getInt());
+        for (char c : encryptedSalt.toCharArray())
+            if (c != '=')
+                encodedSalt.append(getChar(alphabet.indexOf(c) - random.nextInt(alphabet.size())));
         int salt = ByteBuffer.wrap(
-                BaseEncoding.base32().decode(
-                        String.format("%.7s", input)
-                )
+                BaseEncoding.base32().decode(encodedSalt)
         ).getInt();
         String cipheredMessage = input.replaceFirst(
                 String.format("%.7s", input), "");
 
         //We recover the seed from the salt and the key and we intialize the generator with it
-        Random random = new Random(ByteBuffer.wrap(getHash(key, salt)).getInt());
+        random = new Random(ByteBuffer.wrap(getHash(key, salt)).getInt());
 
         StringBuilder decipheredOutput = new StringBuilder();
         for (char c : cipheredMessage.toCharArray())
@@ -75,7 +87,8 @@ public class Ciphyor {
                 ? Integer.MAX_VALUE - keyHash
                 : Integer.MAX_VALUE;
 
-        return new Random().ints(randomNumberOrigin, randomNumberBound).findFirst().getAsInt();
+        OptionalInt salt = new Random().ints(randomNumberOrigin, randomNumberBound).findFirst();
+        return salt.isPresent() ? salt.getAsInt() : 0;
     }
 
     private static byte[] getHash(String key, int salt) {
