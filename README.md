@@ -26,3 +26,6 @@ A Java implementation of my own encryption algorithm inspired by Vernam one
 * The rest of the message is deciphered using the same method but with the seed
 * The message is decoded from base32 (using Guava)
 * A String which contains the deciphered message is returned 
+
+## Download
+Here you can download the latest release: https://github.com/Th0rgal/Ciphyor/releases
